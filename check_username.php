@@ -4,7 +4,16 @@ function check_username($url) {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_exec($ch);
+    
+    // Execute cURL request
+    $response = curl_exec($ch);
+
+    // Check for cURL errors
+    if (curl_errno($ch)) {
+        $error_msg = curl_error($ch);
+        curl_close($ch);
+        return ['error' => true, 'message' => $error_msg];
+    }
 
     $response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
@@ -38,9 +47,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     foreach ($platforms as $platform => $url) {
-        $results[$platform] = check_username($url);
+        $result = check_username($url);
+
+        // Handle cURL error responses
+        if (isset($result['error']) && $result['error']) {
+            $results[$platform] = 'Error: ' . $result['message'];
+        } else {
+            $results[$platform] = $result ? 'Available' : 'Taken';
+        }
     }
 
     header('Content-Type: application/json');
     echo json_encode($results);
 }
+
