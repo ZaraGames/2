@@ -31,6 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = htmlspecialchars($_POST['username']);
     $results = [];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Output the received POST data for debugging
+    echo json_encode([
+        'received' => true,
+        'username' => $_POST['username']
+    ]);
+    exit;
+}
+//2
+    
     // Check on different platforms
     $platforms = [
         'YouTube' => 'https://www.youtube.com/' . $username,
