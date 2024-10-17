@@ -14,17 +14,22 @@ document.getElementById('usernameForm').addEventListener('submit', function(even
         },
         body: 'username=' + encodeURIComponent(username)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         let result = '<ul>';
-        for (const [platform, available] of Object.entries(data)) {
-            result += `<li>${platform}: ${available ? 'Available' : 'Taken'}</li>`;
+        for (const [platform, status] of Object.entries(data)) {
+            result += `<li>${platform}: ${status}</li>`;
         }
         result += '</ul>';
         resultDiv.innerHTML = result;
     })
     .catch(error => {
         console.error('Error:', error);
-        resultDiv.innerHTML = 'An error occurred while checking the username.';
+        resultDiv.innerHTML = `An error occurred: ${error.message}`;
     });
 });
